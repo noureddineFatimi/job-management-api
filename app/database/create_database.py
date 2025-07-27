@@ -2,7 +2,7 @@ import sqlite3
 import pathlib
 import os
 
-DB_PATH = os.path.join(pathlib.Path.cwd().parent, 'database.sqlite')
+DB_PATH = os.path.join(pathlib.Path(__file__).parent.parent.parent, 'database.sqlite')
 
 if os.path.exists(DB_PATH):
     os.remove(DB_PATH)
@@ -83,14 +83,14 @@ CREATE TABLE offres_emploi (
     ville_id INTEGER NOT NULL,
     secteur_activite_id INTEGER NOT NULL,
     fonction_id INTEGER NOT NULL,
-    diplome_requis TEXT NOT NULL,
-    niveau_etude_requis TEXT NOT NULL,
+    diplome_requis TEXT,
+    niveau_etude_requis TEXT,
     type_offre TEXT NOT NULL,
-    annees_experience_min INTEGER NOT NULL,
-    annees_experience_max INTEGER NOT NULL,
+    annees_experience_min INTEGER,
+    annees_experience_max INTEGER,
     nbr_employes_demande INTEGER NOT NULL,
-    salaire_min INTEGER NOT NULL,
-    salaire_max INTEGER NOT NULL,
+    salaire_min INTEGER,
+    salaire_max INTEGER,
     description TEXT,
     nbr_candidats INTEGER DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -116,17 +116,21 @@ CREATE TABLE competences (
 cursor.execute("""
 CREATE TABLE candidatures (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    id_offre INTEGER UNIQUE NOT NULL,
+    id_offre INTEGER NOT NULL,
     nom TEXT NOT NULL,
     prenom TEXT NOT NULL,
-    email TEXT UNIQUE NOT NULL,
-    numero_tel TEXT UNIQUE,
+    email TEXT NOT NULL,
+    numero_tel TEXT NOT NULL,
     cv_id INTEGER UNIQUE NOT NULL,
     date_postulation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY(id_offre) REFERENCES offres_emploi(id),
     FOREIGN KEY(cv_id) REFERENCES files(id)
 )
 """)
+
+placeholder_path = os.path.join(pathlib.Path(__file__).parent.parent.parent, 'placeholder.png' )
+
+cursor.execute("INSERT INTO files VALUES (?, ?, ?, ?) ", (1, placeholder_path, "placeholder.png", "image/png"))
 
 conn.commit()
 conn.close()
