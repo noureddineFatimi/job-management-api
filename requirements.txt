@@ -4,3 +4,4 @@ fastapi[standard]
 uvicorn
 pyjwt
 bcrypt==3.2.2
+python-jose

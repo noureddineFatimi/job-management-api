@@ -14,6 +14,13 @@ class Role(Base):
 
     users = relationship("User", back_populates = "role")
 
+class RevokedToken(Base):
+    __tablename__ = "revoked_tokens"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    jti = Column(String, unique=True, nullable =False)
+    revoked_at = Column(DateTime, default = datetime.now(gmt_plus_1_timezone))
+    
 class User(Base):
     __tablename__ = "users"
 

@@ -78,21 +78,21 @@ class OffresPaginesOut(BaseModel):
         from_attributes = True
 
 class CompetencesIn(BaseModel):
-    nom_competence: str = Field(min_length= 5, max_length= 15, pattern="^[a-zA-Z]+$")
+    nom_competence: str = Field(min_length= 5, max_length= 15, pattern="^[a-zA-Z\s]+$")
     niveau: Optional[str] 
 
     @field_validator("niveau")
     def valider_niveau(cls, value):
-        if value is not None and (len(value) > 15 or len(value) < 5 or not re.match("^[a-zA-Z]+$", value)):
+        if value is not None and (len(value) > 15 or len(value) < 5 or not re.match("^[a-zA-Z\s]+$", value)):
             raise ValueError("Le niveau entré est invalide")
         return value
 
 class OffreIn(BaseModel):
     fichier_id: Optional[int]
-    nom_entreprise: str = Field(min_length= 2, max_length= 15, pattern="^[a-zA-Z0-9_\-']+$")
+    nom_entreprise: str = Field(min_length= 2, max_length= 15, pattern="^[a-zA-Z0-9_\-'\s]+$")
     adresse: Optional[str] 
     ville_id_entreprise: Optional[int] 
-    titre: str = Field(min_length= 2, max_length= 15, pattern="^[a-zA-Z0-9_'/\"]+$")
+    titre: str = Field(min_length= 2, max_length= 35, pattern="^[a-zA-Z0-9_'/\"\s]+$")
     teletravail: Optional[str] 
     diplome_requis: Optional[str] 
     niveau_etude_requis: Optional[str] 
@@ -121,16 +121,16 @@ class OffreIn(BaseModel):
         return value
 
 class CompetencesUpdate(BaseModel):
-    nom_competence: Optional[str] = Field(None, min_length=5, max_length=15, pattern="^[a-zA-Z]+$") 
-    niveau: Optional[str] = Field(None, min_length=5, max_length=15, pattern="^[a-zA-Z]+$") 
+    nom_competence: Optional[str] = Field(None, min_length=5, max_length=15, pattern="^[a-zA-Z\s]+$") 
+    niveau: Optional[str] = Field(None, min_length=5, max_length=15, pattern="^[a-zA-Z\s]+$") 
 
 class EntrepriseUpdate(BaseModel):
-    nom_entreprise: Optional[str] = Field(None, min_length=2, max_length=15, pattern="^[a-zA-Z0-9_\-']+$") 
+    nom_entreprise: Optional[str] = Field(None, min_length=2, max_length=15, pattern="^[a-zA-Z0-9_\-'\s]+$") 
     adresse: Optional[str] = Field(None, max_length=50) 
     ville_id: Optional[int] = None
 
 class OffreUpdate(BaseModel):
-    titre: Optional[str] = Field(None, min_length=2, max_length=15, pattern="^[a-zA-Z0-9_'/\"]+$") 
+    titre: Optional[str] = Field(None, min_length=2, max_length=15, pattern="^[a-zA-Z0-9_'/\"\s]+$") 
     teletravail: Optional[str] = None
     diplome_requis: Optional[str] = None
     niveau_etude_requis: Optional[str] = None
@@ -149,7 +149,7 @@ class OffreUpdate(BaseModel):
 
 class ApplyIn(BaseModel):
     cv_id: Optional[int]
-    nom: str = Field(min_length= 3, max_length= 10, pattern="^[a-zA-Z\-]+$")
-    prenom: str = Field(min_length= 3, max_length= 10, pattern="^[a-zA-Z\-]+$")
+    nom: str = Field(min_length= 3, max_length= 10, pattern="^[a-zA-Z\-\s]+$")
+    prenom: str = Field(min_length= 3, max_length= 10, pattern="^[a-zA-Z\-\s]+$")
     email: Optional[EmailStr]
-    numero_tel: str = Field(..., min_length=10, max_length=10, pattern=r"^\d{10}$")
+    numero_tel: str = Field(..., min_length=10, max_length=10, pattern=r"^(05|06|07)\d{8}$")

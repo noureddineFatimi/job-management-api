@@ -32,6 +32,14 @@ CREATE TABLE users (
 """)
 
 cursor.execute("""
+CREATE TABLE revoked_tokens(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    jti TEXT UNIQUE NOT NULL,
+    revoked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
+""")
+
+cursor.execute("""
 CREATE TABLE villes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     nom_ville TEXT UNIQUE NOT NULL
@@ -132,5 +140,118 @@ placeholder_path = os.path.join(pathlib.Path(__file__).parent.parent.parent, 'pl
 
 cursor.execute("INSERT INTO files VALUES (?, ?, ?, ?) ", (1, placeholder_path, "placeholder.png", "image/png"))
 
+fonctions = [
+    "Achats / Supply Chain",
+    "Administration des ventes / SAV",
+    "Agriculture (métiers de l')",
+    "Assistanat de Direction / Services Généraux",
+    "Assurance (métiers de l')",
+    "Audit / Conseil",
+    "Avocat / Juriste / Fiscaliste",
+    "Banque (métiers de la)",
+    "Call Centers (métiers de)",
+    "Caméraman / Monteur / Preneur de son",
+    "Commercial / Vente / Export",
+    "Communication / Publicité / RP",
+    "Coursier / Gardiennage / Propreté",
+    "Dirigeants sur ExeKutive.biz",
+    "Distribution (métiers de la)",
+    "Electricité",
+    "Enseignement",
+    "Environnement (métiers de l')",
+    "Gestion / Comptabilité / Finance",
+    "Gestion projet / Etudes / R&D",
+    "Hôtellerie / Restauration (métiers de)",
+    "Immobilier / Promotion (métiers de)",
+    "Informatique / Electronique",
+    "Journalisme / Traduction",
+    "Logistique / Transport (métiers de)",
+    "Marketing",
+    "Multimédia / Internet",
+    "Médical / Paramédical",
+    "Méthodes / Process / Industrialisation",
+    "Production / Qualité / Sécurité / Maintenance",
+    "RH / Personnel / Formation",
+    "Responsable de Département",
+    "Santé / Social (métiers de)",
+    "Sport / Loisirs (métiers de)",
+    "Tourisme (métiers du)",
+    "Travaux / Chantiers / BTP",
+    "Télécoms / Réseaux",
+    "Urbanisme / architecture"
+]
+
+for nom in fonctions:
+    cursor.execute("INSERT INTO fonctions (nom_fonction) VALUES (?)", (nom,))
+
+secteurs_activite = [
+    "Agence pub / Marketing Direct",
+    "Agriculture / Environnement",
+    "Agroalimentaire",
+    "Ameublement / Décoration",
+    "Assurance / Courtage",
+    "Audiovisuel",
+    "Automobile / Motos / Cycles",
+    "Autres Industries",
+    "Autres services",
+    "Aéronautique / Spatial",
+    "BTP / Génie Civil",
+    "Banque / Finance",
+    "Centre d'appel",
+    "Chimie / Parachimie / Peintures",
+    "Communication / Evénementiel",
+    "Comptabilité / Audit",
+    "Conseil / Etudes",
+    "Cosmétique / Parfumerie / Luxe",
+    "Distribution",
+    "Edition / Imprimerie",
+    "Electricité",
+    "Electro-mécanique / Mécanique",
+    "Energie",
+    "Enseignement / Formation",
+    "Hôtellerie / Restauration",
+    "Immobilier / Promoteur / Agence",
+    "Import / Export / Négoce",
+    "Informatique",
+    "Internet / Multimédia",
+    "Juridique / Cabinet d’avocats",
+    "Métallurgie / Sidérurgie",
+    "Offshoring / Nearshoring",
+    "Pharmacie / Santé",
+    "Plasturgie",
+    "Pétrole / Gaz",
+    "Recrutement / Intérim",
+    "Service public / Administration",
+    "Telecom",
+    "Textile / Cuir",
+    "Tourisme / Voyage / Loisirs",
+    "Transport / Messagerie / Logistique"
+]
+
+for secteur in secteurs_activite:
+    cursor.execute("INSERT INTO secteurs_activite (nom_secteur) VALUES (?)", (secteur,))
+
+villes = [
+    "Casablanca", "Fès", "Marrakech", "Tangier", "Sale", "Rabat", "Meknès", "Oujda-Angad", "Kenitra", "Agadir",
+    "Tétouan", "Taourirt", "Temara", "Safi", "Khénifra", "El Jadid", "Laâyoune", "Mohammedia", "Kouribga",
+    "Béni Mellal", "Ait Melloul", "Nador", "Taza", "Settat", "Barrechid", "Al Khmissat", "Inezgane",
+    "Ksar El Kebir", "My Drarga", "Larache", "Guelmim", "Berkane", "Ad Dakhla", "Bouskoura", "Al Fqih Ben Çalah",
+    "Oued Zem", "Sidi Slimane", "Errachidia", "Guercif", "Oulad Teïma", "Ben Guerir", "Sefrou", "Fnidq",
+    "Sidi Qacem", "Tiznit", "Moulay Abdallah", "Youssoufia", "Martil", "Aïn Harrouda", "Souq Sebt Oulad Nemma",
+    "Skhirate", "Ouezzane", "Sidi Yahya Zaer", "Al Hoceïma", "M’diq", "Midalt", "Azrou", "El Kelaa des Srarhna",
+    "Ain El Aouda", "Beni Yakhlef", "Ad Darwa", "Al Aaroui", "Qasbat Tadla", "Boujad", "Jerada", "Mrirt",
+    "El Aïoun", "Azemmour", "Temsia"
+]
+
+for ville in villes:
+    cursor.execute("INSERT INTO villes (nom_ville) VALUES (?)", (ville,))
+
+cursor.execute("""
+    INSERT INTO roles (role_name) VALUES ("Administrateur")
+""")
+
 conn.commit()
 conn.close()
+
+print("")
+print("Base de données créée avec succès :)")

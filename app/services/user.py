@@ -1,4 +1,5 @@
-from services.auth import oauth2_scheme, ALGORITHM, SECRET_KEY, pwd_context
+from services.auth import oauth2_scheme, pwd_context
+from config import ALGORITHM, SECRET_KEY
 from pathlib import Path
 from shemas.auth import TokenData
 from datetime import datetime, timedelta, timezone
@@ -9,7 +10,10 @@ from sqlalchemy.orm import Session
 from database.database import get_db
 from fastapi import Depends
 from typing import Annotated
-from models.models import User, Competence, Candidature, OffreEmploi
+from models.models import User, Competence, Candidature, OffreEmploi, RevokedToken
+import jwt
+from config import SECRET_KEY, ALGORITHM
+from jose import JWTError
 
 gmt_plus_1_timezone = timezone(timedelta(hours=1))
 
@@ -26,6 +30,9 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: Se
     credentials_exception = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials",headers={"WWW-Authenticate": "Bearer"})
     try:
         payload = decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        jti = payload.get("jti")
+        if db.query(RevokedToken).filter_by(jti=jti).first():
+            raise HTTPException(status_code=401, detail="Token has been revoked")
         email = payload.get("sub")
         if email is None:
             raise credentials_exception
@@ -75,3 +82,14 @@ def delete_entreprise(offre: OffreEmploi, db: Session = Depends(get_db)):
 def delete_resource(ressource, db: Session = Depends(get_db)):
     db.delete(ressource)
     db.commit()
+
+def add_jwt_token_to_revoked_tokens(token: str, db: Session):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        jti = payload.get("jti")
+        if jti:
+            if not db.query(RevokedToken).filter_by(jti=jti).first():
+                db.add(RevokedToken(jti=jti))
+                db.commit()
+    except JWTError:
+        raise HTTPException(status_code=400, detail="Erreur lors de la deconnexion : ")

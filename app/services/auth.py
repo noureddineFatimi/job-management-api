@@ -4,13 +4,10 @@ from datetime import timedelta, timezone, datetime
 from models.models import User
 from jwt import encode as jwt_encode
 from sqlalchemy.orm import Session
-
-SECRET_KEY = "da1b961c6c4c01de524639567429337c69db283626adf62d0ae7e1ddb0eb1557"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+from config import SECRET_KEY, ALGORITHM
+from uuid import uuid4
 
 gmt_plus_1_timezone = timezone(timedelta(hours=1))
-
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -28,6 +25,6 @@ def authenticate_user(email: str, plain_password: str, db: Session) -> User | No
 def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
     to_encode = data.copy()
     expire = datetime.now(gmt_plus_1_timezone) + (expires_delta or timedelta(minutes=15))
-    to_encode.update({"exp": expire})
+    to_encode.update({"exp": expire, "jti": str(uuid4())})
     encoded_jwt = jwt_encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt

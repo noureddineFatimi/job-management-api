@@ -10,3 +10,5 @@
 /main.py
 /shemas.py
 /user.py
+/.env
+/database.sqlite

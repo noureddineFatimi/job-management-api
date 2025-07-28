@@ -29,21 +29,21 @@ class UserOut(BaseModel):
         from_attributes = True
 
 class UserIn(BaseModel): 
-    first_name: str = Field(min_length=3, max_length=10, pattern="^[a-zA-Z\-]+$") 
-    last_name: str = Field(min_length=3, max_length=10, pattern="^[a-zA-Z\-]+$") 
+    first_name: str = Field(min_length=3, max_length=15, pattern="^[a-zA-Z\-\s]+$") 
+    last_name: str = Field(min_length=3, max_length=15, pattern="^[a-zA-Z\-\s]+$") 
     email: EmailStr 
-    password: str = Field(min_length=8, max_length=20) 
+    password: str = Field(min_length=8, max_length=25) 
 
     @field_validator("password")
     def validator(cls, value):
         return valider_password(cls, value)
  
 class UserUpdate(BaseModel): 
-    first_name: Optional[str] = Field(None, min_length=3, max_length=10, pattern="^[a-zA-Z\-]+$") 
-    last_name: Optional[str] = Field(None, min_length=3, max_length=10, pattern="^[a-zA-Z\-]+$") 
+    first_name: Optional[str] = Field(None, min_length=3, max_length=15, pattern="^[a-zA-Z\-\s]+$") 
+    last_name: Optional[str] = Field(None, min_length=3, max_length=15, pattern="^[a-zA-Z\-\s]+$") 
     email: Optional[EmailStr] = None 
-    password: Optional[str] = Field(None, min_length=8,max_length=20)
+    password_hash: Optional[str] = Field(None, min_length=8,max_length=25)
 
-    @field_validator("password")
+    @field_validator("password_hash")
     def validator(cls, value):
         return valider_password(cls, value)
