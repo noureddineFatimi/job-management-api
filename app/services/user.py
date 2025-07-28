@@ -1,4 +1,4 @@
-from routers.auth import oauth2_scheme, ALGORITHM, SECRET_KEY, pwd_context
+from services.auth import oauth2_scheme, ALGORITHM, SECRET_KEY, pwd_context
 from pathlib import Path
 from shemas.auth import TokenData
 from datetime import datetime, timedelta, timezone

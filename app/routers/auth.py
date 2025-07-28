@@ -12,7 +12,7 @@ from services import auth
 router = APIRouter(tags=["authentification"])
 
 @router.post("/token", response_model=TokenOut)
-async def se_connecter_pour_jwt_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: Session = Depends(get_db)):
+async def recuperer_le_token_jwt(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: Session = Depends(get_db)):
     user = auth.authenticate_user(form_data.username, form_data.password, db)
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Identifiants incorrects", headers={"WWW-Authenticate": "Bearer"})

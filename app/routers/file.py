@@ -4,7 +4,7 @@ from fastapi.responses import FileResponse
 from database.database import get_db
 from fastapi import APIRouter
 from typing import Optional
-from routers.auth import oauth2_scheme
+from services.auth import oauth2_scheme
 from typing import Annotated
 from services.file import ALLOWED_IMAGE_TYPES, process_upload_file, check_file_exist, UPLOAD_PATH, check_entreprise_exist, delete_logo, MAX_FILE_SIZE, ALLOWED_DOC_TYPES, update_logo
 

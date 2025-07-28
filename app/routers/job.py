@@ -6,7 +6,7 @@ from shemas.job import OffreIn, OffresPaginesOut, OffreUpdate, OffreOut, ApplyIn
 from typing import Optional
 from fastapi import APIRouter
 from sqlalchemy.exc import SQLAlchemyError
-from routers.auth import oauth2_scheme
+from services.auth import oauth2_scheme
 from routers.user import get_current_user 
 from typing import Annotated
 from services import job
