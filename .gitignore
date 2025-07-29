@@ -12,5 +12,10 @@
 /user.py
 /.env
 /database.sqlite
-/uploads/cv/
-/uploads/images/
+uploads/**/*
+!uploads/
+!uploads/.gitkeep
+!uploads/images/
+!uploads/images/.gitkeep
+!uploads/cv/
+!uploads/cv/.gitkeep
