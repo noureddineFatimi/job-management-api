@@ -12,3 +12,5 @@
 /user.py
 /.env
 /database.sqlite
+/uploads/cv/
+/uploads/images/

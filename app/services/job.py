@@ -66,13 +66,14 @@ def create_and_flush_offre(offre: OffreIn, entreprise: Entreprise ,current_user:
     return offre_enre 
 
 def create_and_flush_competences(competences: list[CompetencesIn], offre_enre: OffreEmploi,  db: Session = Depends(get_db)):
-    for competence in competences:
-        c = Competence(
-                nom_competence=competence.nom_competence,
-                niveau=competence.niveau,
-                id_offre=offre_enre.id
-            )
-        db.add(c)
+    if competences is not None:
+        for competence in competences:
+            c = Competence(
+                    nom_competence=competence.nom_competence,
+                    niveau=competence.niveau,
+                    id_offre=offre_enre.id
+                )
+            db.add(c)
 
 def update_offre(dict, offre_db: OffreEmploi, db: Session = Depends(get_db)):
     for k, v in dict.items():
@@ -82,15 +83,17 @@ def update_offre(dict, offre_db: OffreEmploi, db: Session = Depends(get_db)):
         e = offre_db.entreprise
         for k, v in dict["entreprise"].items():
             setattr(e, k, v)
-    if "competences" in dict and dict["competences"]:
+    if "competences" in dict:
         db.query(Competence).filter(Competence.id_offre == offre_db.id).delete()
-        for competence in dict["competences"]:
-            c = Competence(
-                nom_competence=competence["nom_competence"],
-                niveau=competence["niveau"],
-                id_offre=offre_db.id
-            )
-            db.add(c)
+        if dict["competences"] : 
+            db.query(Competence).filter(Competence.id_offre == offre_db.id).delete()
+            for competence in dict["competences"]:
+                c = Competence(
+                    nom_competence=competence["nom_competence"],
+                    niveau=competence["niveau"],
+                    id_offre=offre_db.id
+                )
+                db.add(c)
     offre_db.updated_at = datetime.now(gmt_plus_1_timezone)
     db.commit()
     db.refresh(offre_db)
