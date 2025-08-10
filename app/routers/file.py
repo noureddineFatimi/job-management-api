@@ -12,8 +12,8 @@ from models.models import User
 router = APIRouter(tags=["fichiers"])
 
 @router.get("/fichiers/{id_fichier}")
-def recuperer_fichier_par_id(id_file: int, db: Session = Depends(get_db)):
-    file = check_file_exist(id_file, db)
+def recuperer_fichier_par_id(id_fichier: int, db: Session = Depends(get_db)):
+    file = check_file_exist(id_fichier, db)
     if not file:
         raise HTTPException(status_code = 404, detail = "fichier_inexistant")
     return FileResponse(path = file.file_path, media_type = file.file_type, filename = file.file_name)

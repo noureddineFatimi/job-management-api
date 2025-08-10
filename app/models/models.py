@@ -57,6 +57,7 @@ class OffreEmploi(Base):
     salaire_max = Column(Integer)
     description = Column(Text)
     nbr_candidats = Column(Integer, default = 0 )
+    deadline_postulation  = Column(DateTime, nullable = False)
     created_at = Column(DateTime, default = datetime.now(gmt_plus_1_timezone))
     updated_at = Column(DateTime)
 

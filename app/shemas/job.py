@@ -23,6 +23,7 @@ class FonctionOut(BaseModel):
         from_attributes = True
 
 class FileOut(BaseModel):
+    id: Optional[int]
     file_path: Optional[str]
     file_name: Optional[str]
     file_type: Optional[str]
@@ -60,6 +61,7 @@ class OffreOut(BaseModel):
     description: Optional[str]
     nbr_candidats: Optional[int]
     created_at: Optional[datetime]
+    deadline_postulation: Optional[datetime]
     user: Optional[UserOut]
     entreprise: Optional[EntrepriseOut]
     ville: Optional[VilleOut]
@@ -106,6 +108,7 @@ class OffreIn(BaseModel):
     id_fonction: Optional[int]
     description: Optional[str]
     id_ville_offre: Optional[int]
+    deadline_postulation: Optional[datetime]
     competences: Optional[list[CompetencesIn]]
 
     @field_validator("description")
@@ -144,6 +147,7 @@ class OffreUpdate(BaseModel):
     fonction_id: Optional[int] = None
     description: Optional[str] = None
     ville_id: Optional[int] = None
+    deadline_postulation: Optional[datetime] = None
     entreprise: Optional[EntrepriseUpdate] = None
     competences: Optional[list[CompetencesUpdate]] = None
 

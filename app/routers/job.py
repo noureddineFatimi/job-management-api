@@ -12,9 +12,13 @@ from services import job
 
 router = APIRouter(tags=["offres d'emploi"])
 
+@router.get("/offres/resources")
+def recuperer_ressources(db : Session =  Depends(get_db)):
+    return job.recuperer_villes_fct_secteurs(db)
+
 @router.get("/offres/search", response_model=OffresPaginesOut)
-def rechercher_offres_paginees(db: Session = Depends(get_db), secteur_activite_id: Optional[int] = None, fonction_id: Optional[int] = None,  ville_id: Optional[int] = None, annees_experience_min: Optional[int] = None, type_offre: Optional[str] = None, limit: int = Query(10, ge=1), offset: int = Query(0, ge=0)):
-    result = job.filter_offres(secteur_activite_id, fonction_id, ville_id, annees_experience_min, type_offre, limit, offset, db)
+def rechercher_offres_paginees(db: Session = Depends(get_db),  mot_cle: Optional[str] = None, secteur_activite_id: Optional[int] = None, fonction_id: Optional[int] = None,  ville_id: Optional[int] = None, annees_experience_min: Optional[int] = None, types_offre: Optional[list[str]] = Query(None), limit: int = Query(10, ge=1), offset: int = Query(0, ge=0)):
+    result = job.filter_offres(mot_cle, secteur_activite_id, fonction_id, ville_id, annees_experience_min, types_offre, limit, offset, db)
     return result
 
 @router.get("/offres/mes", response_model = list[OffreOut])

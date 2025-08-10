@@ -101,6 +101,7 @@ CREATE TABLE offres_emploi (
     salaire_max INTEGER,
     description TEXT,
     nbr_candidats INTEGER DEFAULT 0,
+    deadline_postulation TIMESTAMP NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
     FOREIGN KEY(user_id) REFERENCES users(id),

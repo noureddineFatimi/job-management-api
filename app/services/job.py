@@ -1,4 +1,4 @@
-from models.models import OffreEmploi, Competence, Candidature, Entreprise, Candidature, User
+from models.models import OffreEmploi, Competence, Candidature, Entreprise, Candidature, User, Ville, Fonction, SecteurActivite
 from shemas.job import OffreIn, ApplyIn, CompetencesIn
 from datetime import datetime, timezone, timedelta
 from typing import Optional
@@ -6,11 +6,14 @@ from pathlib import Path
 from sqlalchemy.orm import Session
 from database.database import get_db
 from fastapi import Depends
+from sqlalchemy import desc
 
 gmt_plus_1_timezone = timezone(timedelta(hours=1))
 
-def filter_offres(secteur_activite_id: Optional[int] = None, fonction_id: Optional[int] = None, ville_id: Optional[int] = None, annees_experience_min: Optional[int] = None, type_offre: Optional[str] = None, limit: int = 10, offset: int = 0,db: Session = Depends(get_db)):
+def filter_offres(mot_cle: Optional[str] = None, secteur_activite_id: Optional[int] = None, fonction_id: Optional[int] = None, ville_id: Optional[int] = None, annees_experience_min: Optional[int] = None, types_offre: Optional[list[str]] = None, limit: int = 10, offset: int = 0,db: Session = Depends(get_db)):
     offres = db.query(OffreEmploi)
+    if mot_cle:
+        offres = offres.filter(OffreEmploi.titre.ilike(f"%{mot_cle}%"))
     if secteur_activite_id:
         offres = offres.filter(OffreEmploi.secteur_activite_id == secteur_activite_id)
     if fonction_id:
@@ -19,10 +22,10 @@ def filter_offres(secteur_activite_id: Optional[int] = None, fonction_id: Option
         offres = offres.filter(OffreEmploi.ville_id == ville_id)
     if annees_experience_min:
         offres = offres.filter(OffreEmploi.annees_experience_min >= annees_experience_min)
-    if type_offre:
-        offres = offres.filter(OffreEmploi.type_offre == type_offre)
+    if types_offre:
+        offres = offres.filter(OffreEmploi.type_offre.in_(types_offre)) 
     total = offres.count()
-    offres = offres.offset(offset).limit(limit).all()
+    offres = offres.order_by(desc(OffreEmploi.deadline_postulation)).offset(offset).limit(limit).all()
     return {"total": total, "offres": offres}
 
 def get_offres_of_user(current_user, db: Session = Depends(get_db)):
@@ -59,7 +62,8 @@ def create_and_flush_offre(offre: OffreIn, entreprise: Entreprise ,current_user:
             nbr_employes_demande=offre.nbr_employes_demande,
             salaire_min=offre.salaire_min,
             salaire_max=offre.salaire_max,
-            description=offre.description
+            description=offre.description,
+            deadline_postulation=offre.deadline_postulation
     )
     db.add(offre_enre)
     db.flush()
@@ -120,6 +124,13 @@ def delete_entreprise(offre: OffreEmploi, db: Session = Depends(get_db)):
 def delete_offre(offre: OffreEmploi, db: Session = Depends(get_db)):
     db.delete(offre)
     db.commit()
+
+def recuperer_villes_fct_secteurs(db: Session = Depends(get_db)):
+    ressources = {"villes": [], "fonctions": [], "secteurs_activite": []}
+    ressources["villes"] = db.query(Ville).all()
+    ressources["fonctions"] = db.query(Fonction).all()
+    ressources["secteurs_activite"] = db.query(SecteurActivite).all()
+    return ressources
 
 def check_candidature_exist(candidature: ApplyIn, id_offre: int, db: Session = Depends(get_db)):
     return db.query(Candidature).filter(Candidature.id_offre == id_offre).filter(Candidature.email == candidature.email).first() is not None
