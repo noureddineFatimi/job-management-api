@@ -46,3 +46,10 @@ def supprimer_logo_entreprise(current_user: Annotated[User, Depends(get_current_
         raise HTTPException(status_code = 404, detail = "entreprise_inexistant")
     m = delete_logo(e, db)
     return m
+
+@router.get("/candidats/cv/{id_fichier}")
+def recuperer_cv_par_id(current_user: Annotated[User, Depends(get_current_user)],id_fichier: int, db: Session = Depends(get_db)):
+    file = check_file_exist(id_fichier, db)
+    if not file:
+        raise HTTPException(status_code = 404, detail = "fichier_inexistant")
+    return FileResponse(path = file.file_path, media_type = file.file_type, filename = file.file_name)

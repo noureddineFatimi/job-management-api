@@ -5,18 +5,21 @@ from shemas.user import UserOut
 import re
 
 class VilleOut(BaseModel):
+    id: Optional[int]
     nom_ville: Optional[str]
     
     class Config:
         from_attributes = True
 
 class SecteurActiviteOut(BaseModel):
+    id: Optional[int]
     nom_secteur: Optional[str]
     
     class Config:
         from_attributes = True
 
 class FonctionOut(BaseModel):
+    id: Optional[int]
     nom_fonction: Optional[str]
     
     class Config:
@@ -32,6 +35,7 @@ class FileOut(BaseModel):
         from_attributes = True
 
 class EntrepriseOut(BaseModel):
+    id: Optional[int]
     nom_entreprise: Optional[str]
     adresse: Optional[str]
     logo: Optional[FileOut]
@@ -48,6 +52,7 @@ class CompetencesOut(BaseModel):
         from_attributes = True
 
 class OffreOut(BaseModel):
+    id: Optional[int]
     titre: Optional[str]
     teletravail: Optional[str]
     diplome_requis: Optional[str]
@@ -82,12 +87,6 @@ class OffresPaginesOut(BaseModel):
 class CompetencesIn(BaseModel):
     nom_competence: str = Field(min_length= 5, max_length= 15, pattern="^[a-zA-Z\s]+$")
     niveau: Optional[str] 
-
-    @field_validator("niveau")
-    def valider_niveau(cls, value):
-        if value is not None and (len(value) > 15 or len(value) < 5 or not re.match("^[a-zA-Z\s]+$", value)):
-            raise ValueError("Le niveau entré est invalide")
-        return value
 
 class OffreIn(BaseModel):
     fichier_id: Optional[int]
@@ -125,7 +124,7 @@ class OffreIn(BaseModel):
 
 class CompetencesUpdate(BaseModel):
     nom_competence: Optional[str] = Field(None, min_length=5, max_length=15, pattern="^[a-zA-Z\s]+$") 
-    niveau: Optional[str] = Field(None, min_length=5, max_length=15, pattern="^[a-zA-Z\s]+$") 
+    niveau: Optional[str] = Field(None) 
 
 class EntrepriseUpdate(BaseModel):
     nom_entreprise: Optional[str] = Field(None, min_length=2, max_length=15, pattern="^[a-zA-Z0-9_\-'\s]+$") 
@@ -133,7 +132,7 @@ class EntrepriseUpdate(BaseModel):
     ville_id: Optional[int] = None
 
 class OffreUpdate(BaseModel):
-    titre: Optional[str] = Field(None, min_length=2, max_length=15, pattern="^[a-zA-Z0-9_'/\"\s]+$") 
+    titre: Optional[str] = Field(None, min_length=2, max_length=35, pattern="^[a-zA-Z0-9_'/\"\s]+$") 
     teletravail: Optional[str] = None
     diplome_requis: Optional[str] = None
     niveau_etude_requis: Optional[str] = None
@@ -157,3 +156,11 @@ class ApplyIn(BaseModel):
     prenom: str = Field(min_length= 3, max_length= 10, pattern="^[a-zA-Z\-\s]+$")
     email: Optional[EmailStr]
     numero_tel: str = Field(..., min_length=10, max_length=10, pattern=r"^(05|06|07)\d{8}$")
+
+class ApplyOut(BaseModel):
+    nom: Optional[str]
+    prenom: Optional[str]
+    email: Optional[str]
+    numero_tel: Optional[str]
+    date_postulation: Optional[datetime]
+    cv_id: Optional[int]

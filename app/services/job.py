@@ -136,9 +136,12 @@ def check_candidature_exist(candidature: ApplyIn, id_offre: int, db: Session = D
     return db.query(Candidature).filter(Candidature.id_offre == id_offre).filter(Candidature.email == candidature.email).first() is not None
 
 def create_and_save_candidature(offre: OffreEmploi, candidature: ApplyIn, db : Session =  Depends(get_db)):
-    c = Candidature(id_offre = offre.id, nom = candidature.nom, prenom = candidature.prenom, cv_id = candidature.cv_id, email = candidature.email, numero_tel = candidature.numero_tel)
+    c = Candidature(id_offre = offre.id, nom = candidature.nom.lower().capitalize(), prenom = candidature.prenom.lower().capitalize(), cv_id = candidature.cv_id, email = candidature.email, numero_tel = candidature.numero_tel)
     db.add(c)
     offre.nbr_candidats = offre.nbr_candidats + 1
     db.commit()
     db.refresh(c)
     return c
+
+def get_applications(id_offre: int, db : Session =  Depends(get_db)):
+    return db.query(Candidature).filter(Candidature.id_offre == id_offre)

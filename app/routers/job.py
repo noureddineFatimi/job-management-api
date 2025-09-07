@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from fastapi import Depends, HTTPException, Query
 from models.models import User
 from database.database import get_db
-from shemas.job import OffreIn, OffresPaginesOut, OffreUpdate, OffreOut, ApplyIn
+from shemas.job import OffreIn, OffresPaginesOut, OffreUpdate, OffreOut, ApplyIn, ApplyOut
 from typing import Optional
 from fastapi import APIRouter
 from sqlalchemy.exc import SQLAlchemyError
@@ -84,3 +84,7 @@ def postuler_a_offre(id_offre: int, candidature: ApplyIn, db : Session =  Depend
         return c
     except SQLAlchemyError as e:
         raise HTTPException(status_code=400, detail="Erreur lors de la postulation à l'offre : " + str(e))
+
+@router.get("/offres/{id_offre}/applications", response_model = list[ApplyOut])
+def get_applications_of_offre(current_user: Annotated[User, Depends(get_current_user)],id_offre: int, db : Session = Depends(get_db)):
+    return job.get_applications(id_offre, db)
