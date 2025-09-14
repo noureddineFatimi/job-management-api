@@ -73,7 +73,8 @@ class OffreOut(BaseModel):
     secteur_activite: Optional[SecteurActiviteOut]
     fonction: Optional[FonctionOut]
     competences: Optional[list[CompetencesOut]]
-
+    resume: Optional[str]
+    
     class Config:
         from_attributes = True
 
@@ -112,8 +113,8 @@ class OffreIn(BaseModel):
 
     @field_validator("description")
     def valider_desc(cls, value):
-        if value is not None and len(value) > 100 :
-            raise ValueError("La description ne doit pas dépasser 100 caractères")
+        if value is not None and len(value) > 1000 :
+            raise ValueError("La description ne doit pas dépasser 1000 caractères")
         return value
     
     @field_validator("adresse")

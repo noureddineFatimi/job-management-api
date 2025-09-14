@@ -41,7 +41,7 @@ def creer_offre(current_user: Annotated[User, Depends(get_current_user)], offre:
         job.create_and_flush_competences(offre.competences, offre_enre, db)
         db.commit()  
         db.refresh(offre_enre)
-        return {"message": "Offre insérée avec succès", "id_offre": offre_enre.id}
+        return {"message": "Offre insérée avec succès", "id_offre": offre_enre.id, "offre": offre_enre}
     except SQLAlchemyError as e:
         db.rollback() 
         raise HTTPException(status_code=400, detail="Erreur lors de l'insertion de l'offre : " + str(e))

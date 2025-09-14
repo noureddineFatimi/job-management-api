@@ -7,6 +7,8 @@ from sqlalchemy.orm import Session
 from database.database import get_db
 from fastapi import Depends
 from sqlalchemy import desc
+from huggingface_hub import InferenceClient
+from config import ACCESS_TOKEN_HUGGING_FACE
 
 gmt_plus_1_timezone = timezone(timedelta(hours=1))
 
@@ -45,7 +47,13 @@ def create_and_flush_entreprise(offre: OffreIn, db: Session = Depends(get_db)):
     db.flush()
     return entreprise 
 
+def generate_resume(description:str):
+    client = InferenceClient(provider="hf-inference",api_key=ACCESS_TOKEN_HUGGING_FACE)
+    result = client.summarization(description,model="facebook/bart-large-cnn")
+    return result.summary_text
+
 def create_and_flush_offre(offre: OffreIn, entreprise: Entreprise ,current_user:  User, db: Session = Depends(get_db)):
+    resume = generate_resume(offre.description)
     offre_enre = OffreEmploi(
             user_id=current_user.id,
             titre=offre.titre,
@@ -63,7 +71,8 @@ def create_and_flush_offre(offre: OffreIn, entreprise: Entreprise ,current_user:
             salaire_min=offre.salaire_min,
             salaire_max=offre.salaire_max,
             description=offre.description,
-            deadline_postulation=offre.deadline_postulation
+            deadline_postulation=offre.deadline_postulation,
+            resume=resume
     )
     db.add(offre_enre)
     db.flush()

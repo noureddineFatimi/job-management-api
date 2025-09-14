@@ -58,6 +58,7 @@ class OffreEmploi(Base):
     description = Column(Text)
     nbr_candidats = Column(Integer, default = 0 )
     deadline_postulation  = Column(DateTime, nullable = False)
+    resume = Column(Text)
     created_at = Column(DateTime, default = datetime.now(gmt_plus_1_timezone))
     updated_at = Column(DateTime)
 
