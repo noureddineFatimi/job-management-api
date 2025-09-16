@@ -1,0 +1,21 @@
+version: "3.8"
+services: 
+  fastapi-backend:
+    build: ./Back-end
+    env_file:
+      - ./Back-end/.env
+    volumes:
+      - ./Back-end/database2.sqlite:/app/database.sqlite
+    networks:
+      - app-network
+    ports:
+      - "9090:90"
+  react-frontend:
+    build: /Front-end
+    networks:
+      - app-network
+    ports:
+      - "8080:80"
+networks:
+  app-network:
+    driver: bridge

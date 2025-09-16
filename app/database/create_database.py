@@ -102,6 +102,7 @@ CREATE TABLE offres_emploi (
     description TEXT,
     nbr_candidats INTEGER DEFAULT 0,
     deadline_postulation TIMESTAMP NOT NULL,
+    resume TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
     FOREIGN KEY(user_id) REFERENCES users(id),

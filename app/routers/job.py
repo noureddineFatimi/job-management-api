@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from fastapi import Depends, HTTPException, Query
-from models.models import User
+from models.models import User, OffreEmploi
 from database.database import get_db
 from shemas.job import OffreIn, OffresPaginesOut, OffreUpdate, OffreOut, ApplyIn, ApplyOut
 from typing import Optional
@@ -11,6 +11,20 @@ from typing import Annotated
 from services import job
 
 router = APIRouter(tags=["offres d'emploi"])
+
+@router.get("/offres/dashboard")
+def get_statistics(current_user: Annotated[User, Depends(get_current_user)], db : Session =  Depends(get_db)):
+    try:
+        nombre_offres_publies = job.get_nombre_offres_publies(current_user, db)
+        nombres_candidatures_recues = job.get_nombre_candidatures_recues(current_user, db)
+        nombre_employes_a_recruter = job.get_nombre_employes_a_recruter(current_user, db)
+        repartition_par_type_de_contrat = job.get_repartition_par_type_de_contrat(current_user, db)
+        repartition_par_secteurs_activite = job.repartition_par_secteurs_activite(current_user, db)
+        repartition_par_mois_annee_courante = job.repartition_par_mois_annee_courante(current_user, db)
+        return {"nombre_offres_publies": nombre_offres_publies,"nombres_candidatures_recues": nombres_candidatures_recues,"nombre_employes_a_recruter": nombre_employes_a_recruter,"repartition_par_type_de_contrat": [{"type": t, "nombre": n} for t, n in repartition_par_type_de_contrat],"repartition_par_secteurs_activite": [{"secteur": s, "nombre": n} for s, n in repartition_par_secteurs_activite],"repartition_par_mois_anne_courante": repartition_par_mois_annee_courante}
+    except SQLAlchemyError as e:
+        db.rollback() 
+        raise HTTPException(status_code=400, detail="Erreur lors de l'insertion de l'offre : " + str(e))
 
 @router.get("/offres/resources")
 def recuperer_ressources(db : Session =  Depends(get_db)):

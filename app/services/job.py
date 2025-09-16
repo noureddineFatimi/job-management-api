@@ -6,11 +6,40 @@ from pathlib import Path
 from sqlalchemy.orm import Session
 from database.database import get_db
 from fastapi import Depends
-from sqlalchemy import desc
+from sqlalchemy import desc, func, extract
 from huggingface_hub import InferenceClient
 from config import ACCESS_TOKEN_HUGGING_FACE
 
 gmt_plus_1_timezone = timezone(timedelta(hours=1))
+
+def get_nombre_offres_publies(current_user, db: Session = Depends(get_db)):
+    return db.query(OffreEmploi).filter(OffreEmploi.user_id == current_user.id).count()
+
+def get_nombre_candidatures_recues(current_user, db: Session = Depends(get_db)):
+    total = db.query(func.sum(OffreEmploi.nbr_candidats)).filter(OffreEmploi.user_id == current_user.id).scalar()
+    return total or 0
+
+def get_nombre_employes_a_recruter(current_user, db: Session = Depends(get_db)):
+    total = db.query(func.sum(OffreEmploi.nbr_employes_demande)).filter(OffreEmploi.user_id == current_user.id).scalar()
+    return total or 0
+
+def get_repartition_par_type_de_contrat(current_user, db: Session = Depends(get_db)):
+    return db.query(OffreEmploi.type_offre, func.count(OffreEmploi.id)).filter(OffreEmploi.user_id == current_user.id).group_by(OffreEmploi.type_offre).all()
+
+def repartition_par_secteurs_activite(current_user, db: Session = Depends(get_db)):
+    return db.query(SecteurActivite.nom_secteur, func.count(OffreEmploi.id)).join(SecteurActivite, OffreEmploi.secteur_activite_id == SecteurActivite.id).filter(OffreEmploi.user_id == current_user.id).group_by(SecteurActivite.nom_secteur).all()
+
+def repartition_par_mois_annee_courante(current_user, db: Session = Depends(get_db)):
+    current_year = datetime.now().year
+    results = (
+        db.query(extract("month", OffreEmploi.created_at).label("mois"),func.count(OffreEmploi.id).label("nombre")).filter(OffreEmploi.user_id == current_user.id,extract("year", OffreEmploi.created_at) == current_year).group_by("mois").order_by("mois").all())
+    liste_des_mois = [{"mois": int(mois), "nombre": nombre} for mois, nombre in results]
+    mois_existants = {obj["mois"] for obj in liste_des_mois}
+    for i in range(1, 13):
+        if i not in mois_existants:
+            liste_des_mois.append({"mois": i, "nombre": 0})
+    liste_des_mois.sort(key=lambda x: x["mois"])
+    return liste_des_mois
 
 def filter_offres(mot_cle: Optional[str] = None, secteur_activite_id: Optional[int] = None, fonction_id: Optional[int] = None, ville_id: Optional[int] = None, annees_experience_min: Optional[int] = None, types_offre: Optional[list[str]] = None, limit: int = 10, offset: int = 0,db: Session = Depends(get_db)):
     offres = db.query(OffreEmploi)
