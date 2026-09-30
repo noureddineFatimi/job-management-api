@@ -14,6 +14,10 @@ Cette API permet la gestion d'offres d'emploi (CRUD), l'authentification JWT, et
 
 ---
 
+## MCD
+
+![description](pfa-db.png)
+
 ## ⚙️ Installation locale
 
 ### 1. 🔁 Cloner le dépôt
@@ -64,7 +68,9 @@ python app/database/create_database.py
 
 ``` bash
 uvicorn app.main:app --reload
-``` 
+```
+![description](pfa-swagger.png)
+![description](pfa-api-swagger-test.png)
 ---
 
 ## 📚 Documentation interactive
