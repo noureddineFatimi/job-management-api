@@ -70,7 +70,7 @@ python app/database/create_database.py
 uvicorn app.main:app --reload
 ```
 ![description](pfa-swagger.png)
-![description](pfa-api-swagger-test.png)
+![description](pfa-api-test-swagger.png)
 ---
 
 ## 📚 Documentation interactive
